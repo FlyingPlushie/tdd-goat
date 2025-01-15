@@ -2,15 +2,12 @@
 - hosts: all
 
   tasks:
-#    - name: Install docker
-#      ansible.builtin.apt:
-#        name: docker.io
-#        state: latest
-#        update_cache: true
-#      become: true
-#
-#    - name: Print working dir
-#      command: pwd
+    - name: Install docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: latest
+        update_cache: true
+      become: true
 
     - name: Build container image locally
       community.docker.docker_image:
@@ -19,35 +16,34 @@
         source: build
         force_source: true
         build:
-          path: /mnt/d/playground/tdd_goat/superlists
+          path: ..
           platform: linux/amd64
-      delegate_to: 127.0.0.1
-      connection: local
+      delegate_to: localhost
 
-#    - name: Export container image locally
-#      community.docker.docker_image:
-#        name: superlists
-#        archive_path: /tmp/superlists-img.tar
-#        source: local
-#      delegate_to: localhost
-#
-#    - name: Upload image to server
-#      ansible.builtin.copy:
-#        src: /tmp/superlists-img.tar
-#        dest: /tmp/superlists-img.tar
-#
-#    - name: Import container image on server
-#      community.docker.docker_image:
-#        name: superlists
-#        load_path: /tmp/superlists-img.tar
-#        source: load
-#        force_source: true
-#        state: present
-#      become: true
-#
-#    - name: Run container
-#      community.docker.docker_container:
-#        name: superlists
-#        image: superlists
-#        state: started
-#        recreate: true
+    - name: Export container image locally
+      community.docker.docker_image:
+        name: superlists
+        archive_path: /tmp/superlists-img.tar
+        source: local
+      delegate_to: localhost
+
+    - name: Upload image to server
+      ansible.builtin.copy:
+        src: /tmp/superlists-img.tar
+        dest: /tmp/superlists-img.tar
+
+    - name: Import container image on server
+      community.docker.docker_image:
+        name: superlists
+        load_path: /tmp/superlists-img.tar
+        source: load
+        force_source: true
+        state: present
+      become: true
+
+    - name: Run container
+      community.docker.docker_container:
+        name: superlists
+        image: superlists
+        state: started
+        recreate: true

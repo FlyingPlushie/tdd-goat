@@ -1,6 +1,8 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException
@@ -15,7 +17,13 @@ MAX_WAIT = 10
 class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self):
-        self.browser = webdriver.Firefox(executable_path=GeckoDriverManager().install()) # webdriver.Firefox()
+        options = Options()
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+
+        service = Service(executable_path='/snap/bin/firefox.geckodriver')
+        self.browser = webdriver.Firefox(options=options, service=service)
+
         test_server = os.environ.get('TEST_SERVER')
         if test_server:
             self.live_server_url = 'http://' + test_server
@@ -90,7 +98,12 @@ class NewVisitorTest(StaticLiveServerTestCase):
         ## We use a new browser session to make sure that no information
         ## of Edith's is coming through from cookies
         self.browser.quit()
-        self.browser = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+
+        options = Options()
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        service = Service(executable_path='/snap/bin/firefox.geckodriver')
+        self.browser = webdriver.Firefox(options=options, service=service)
 
         # Francis visits the home page. There is no sign of Edith's list
         self.browser.get(self.live_server_url)
